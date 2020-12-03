@@ -50,6 +50,26 @@ if housing_first_post is not None:
     FIGURE OUT HOW TO HANDLE ERROR IF NO BEDROOM OR SQUARE FT
     '''
 
+    # check if first post is bedroom
+    # if first post is bedroom, check if square feet is entered
+    # if first post is not bedroom, then there is no second term
+    # br_first_post = housing_first_post[0]
+
+    if housing_first_post[0][-1] == 'r':
+        br_first_post = housing_first_post[0]
+
+        if housing_first_post[2]:
+            sqft_first_post = housing_first_post[2]
+        else:
+            sqft_first_post = 'NA'
+
+    elif housing_first_post[0][-1] == '2':
+        br_first_post = 'NA'
+        sqft_first_post = housing_first_post[0]
+
+    print(br_first_post)
+    print(sqft_first_post)
+
 else:
     print('no text')
 
@@ -60,3 +80,68 @@ print(hood_first_post)
 #getting title of post
 title_first_post = first_post.find('a', class_="result-title").text
 print(title_first_post)
+
+'''
+Creating for loop to get all 120 posts on page
+'''
+
+# all arrays initiated here
+prices = []
+datetimes = []
+hoods = []
+titles = []
+brs = []
+sqfts = []
+
+def dataAllPosts(posts):
+
+    for post in posts:
+
+        if post.find('span', class_="result-hood") is not None:
+
+            # prices & datetimes are easily appended to arrays
+            PRICE = post.find('span', class_="result-price").text.strip()
+            DATETIME = post.find('time', class_="result-date")['datetime']
+            NEIGHBORHOOD = post.find('span', class_="result-hood").text
+            TITLE = post.find('a', class_="result-title").text
+
+            prices.append(PRICE)
+            datetimes.append(DATETIME)
+            hoods.append(NEIGHBORHOOD)
+            titles.append(TITLE)
+
+            # bedrooms & square footage if statements
+            # check if housing span is present
+            if post.find('span', class_="housing") is not None:
+                # split housing span into array
+                housing_post = post.find('span', class_="housing").text.split()
+
+                # check if bedroom is inputted
+                if housing_post[0][-1] == 'r':
+                    brs.append(housing_post[0])
+
+                    # take square footage if present
+                    if housing_post[-1] != '-':
+                        sqfts.append(housing_post[2])
+                    else:
+                        sqfts.append('NA')
+
+                # else check if square footage is first
+                elif housing_post[0][-1] == '2':
+                    brs.append('NA')
+                    sqfts.append(housing_post[0])
+
+                else:
+                    print('Nothing input')
+            # no bedrooms or square footage added
+            else:
+                sqfts.append('NA')
+                brs.append('NA')
+
+dataAllPosts(posts)
+print(len(prices))
+print(len(datetimes))
+print(len(hoods))
+print(len(titles))
+print(len(brs))
+print(len(sqfts))
