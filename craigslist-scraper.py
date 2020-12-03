@@ -49,10 +49,14 @@ if housing_first_post is not None:
     '''
     FIGURE OUT HOW TO HANDLE ERROR IF NO BEDROOM OR SQUARE FT
     '''
-    
+
 else:
     print('no text')
 
 # getting neighborhood
 hood_first_post = first_post.find('span', class_="result-hood").text
 print(hood_first_post)
+
+#getting title of post
+title_first_post = first_post.find('a', class_="result-title").text
+print(title_first_post)
