@@ -198,3 +198,52 @@ print(len(hoods))
 print(len(titles))
 print(len(brs))
 print(len(sqfts))
+
+sfc_apts = pd.DataFrame(({'posted': datetimes,
+                       'neighborhood': hoods,
+                       'post title': titles,
+                       'number bedrooms': brs,
+                        'sqft': sqfts,
+                        # 'URL': post_links,
+                       'price': prices}))
+
+print(sfc_apts.info())
+sfc_apts.head(10)
+
+#first things first, drop duplicate titles because people are spammy on Craigslist.
+#Let's see how many uniqe posts we really have.
+sfc_apts = sfc_apts.drop_duplicates(subset='post title')
+
+# make the number bedrooms to a float (since np.nan is a float too)
+sfc_apts['number bedrooms'] = sfc_apts['number bedrooms'].apply(lambda x: float(x))
+
+#convert datetime string into datetime object to be able to work with it
+from datetime import datetime
+
+sfc_apts['posted'] = pd.to_datetime(sfc_apts['posted'])
+
+#Looking at what neighborhoods there are with sfc_apts['neighborhood'].unique() allowed me to see what
+#I needed to deal with in terms of cleaning those.
+
+#remove the parenthesis from the left and right of the neighborhoods
+sfc_apts['neighborhood'] = sfc_apts['neighborhood'].map(lambda x: x.lstrip('(').rstrip(')'))
+
+#titlecase them
+sfc_apts['neighborhood'] = sfc_apts['neighborhood'].str.title()
+
+#just take the first name of the neighborhood list, splitting on the '/' delimiter
+sfc_apts['neighborhood'] = sfc_apts['neighborhood'].apply(lambda x: x.split('/')[0])
+
+#fix one-offs that
+# sfc_apts['neighborhood'].replace('Belmont, Ca', 'Belmont', inplace=True)
+# sfc_apts['neighborhood'].replace('Hercules, Pinole, San Pablo, El Sob', 'Hercules', inplace=True)
+
+#remove whitespaces
+sfc_apts['neighborhood'] = sfc_apts['neighborhood'].apply(lambda x: x.strip())
+
+#save the clean data
+sfc_apts.to_csv("sfc_apts_1642_Jan_2_19_clean.csv", index=False)
+
+'''
+NEED TO CLEAN DATA CORRECTLY!!!
+'''
