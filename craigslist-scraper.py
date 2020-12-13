@@ -61,19 +61,19 @@ if housing_first_post is not None:
     # br_first_post = housing_first_post[0]
 
     if housing_first_post[0][-1] == 'r':
-        br_first_post = housing_first_post[0]
+        br_first_post = housing_first_post[0].replace('br', '')
 
         if housing_first_post[-1] != '-':
-            sqft_first_post = housing_first_post[2]
+            sqft_first_post = housing_first_post[2].replace('ft2', '')
         else:
             sqft_first_post = 'NA'
 
     elif housing_first_post[0][-1] == '2':
         br_first_post = 'NA'
-        sqft_first_post = housing_first_post[0]
+        sqft_first_post = housing_first_post[0].replace('ft2', '')
 
-    # print(br_first_post)
-    # print(sqft_first_post)
+    print(br_first_post)
+    print(sqft_first_post)
 
 else:
     print('no text')
@@ -165,18 +165,18 @@ def dataAllPosts():
 
                     # check if bedroom is inputted
                     if housing_post[0][-1] == 'r':
-                        brs.append(housing_post[0])
+                        brs.append(housing_post[0].replace('br', ''))
 
                         # take square footage if present
                         if (housing_post[-1] != '-' and len_housing_post == 3) or (len_housing_post == 4):
-                            sqfts.append(housing_post[2])
+                            sqfts.append(housing_post[2].replace('ft2', ''))
                         else:
                             sqfts.append('NA')
 
                     # else check if square footage is first
                     elif housing_post[0][-1] == '2':
                         brs.append('NA')
-                        sqfts.append(housing_post[0])
+                        sqfts.append(housing_post[0].replace('ft2', ''))
 
                     else:
                         print('Nothing input')
@@ -215,7 +215,7 @@ sfc_apts.head(10)
 sfc_apts = sfc_apts.drop_duplicates(subset='post title')
 
 # make the number bedrooms to a float (since np.nan is a float too)
-sfc_apts['number bedrooms'] = sfc_apts['number bedrooms'].apply(lambda x: float(x))
+# sfc_apts['number bedrooms'] = sfc_apts['number bedrooms'].apply(lambda x: float(x))
 
 #convert datetime string into datetime object to be able to work with it
 from datetime import datetime
@@ -226,7 +226,7 @@ sfc_apts['posted'] = pd.to_datetime(sfc_apts['posted'])
 #I needed to deal with in terms of cleaning those.
 
 #remove the parenthesis from the left and right of the neighborhoods
-sfc_apts['neighborhood'] = sfc_apts['neighborhood'].map(lambda x: x.lstrip('(').rstrip(')'))
+sfc_apts['neighborhood'] = sfc_apts['neighborhood'].map(lambda x: x.replace('(','').replace(')', ''))
 
 #titlecase them
 sfc_apts['neighborhood'] = sfc_apts['neighborhood'].str.title()
@@ -242,8 +242,6 @@ sfc_apts['neighborhood'] = sfc_apts['neighborhood'].apply(lambda x: x.split('/')
 sfc_apts['neighborhood'] = sfc_apts['neighborhood'].apply(lambda x: x.strip())
 
 #save the clean data
-sfc_apts.to_csv("sfc_apts_1642_Jan_2_19_clean.csv", index=False)
+sfc_apts.to_csv("sfc_apts_clean.csv", index=False)
 
-'''
-NEED TO CLEAN DATA CORRECTLY!!!
-'''
+print(sfc_apts.describe(include='all'))
